@@ -527,7 +527,9 @@ extension AppDelegate {
                     if #available(macOS 14.0, *) {
                         try context.writePNGRepresentation(of:ciImage,
                                                            to:url,
-                                                           format: .RGB10,
+                                                           format: .RGBA16,
+                                                        //    RGBA16 is 16 bit int per channel.https://developer.apple.com/documentation/coreimage/ciformat/rgba16
+                                                        // PNG uses fixed point
                                                            colorSpace:colorSpace
                         )
                     } else {
