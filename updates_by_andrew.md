@@ -56,7 +56,8 @@ Don't use 30fps setting for 30fps games/videos
 ### HDR Screenshot
 
 - macOS does not support writing AVIF or JXL
-- current approach is to write 10 bit HEIF PQ BT2020, but this is limited to 420 chroma sampling
+- macOS can write 10 bit HEIF PQ BT2020, but this is limited to 420 chroma sampling
+- 16 bit PQ PNG remains the best option for HDR screenshots. This supports 444 chroma sampling
 
 ### Notes for building
 
