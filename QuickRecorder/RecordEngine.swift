@@ -511,7 +511,7 @@ extension AppDelegate {
                 // let colorSpace = ciImage.colorSpace ?? CGColorSpaceCreateDeviceRGB()
             
             // Image exposure needs to be increased by one stop to match the original
-             ciImage = ciImage.applyingFilter("CIExposureAdjust", parameters: ["inputEV": 1.0])
+            //  ciImage = ciImage.applyingFilter("CIExposureAdjust", parameters: ["inputEV": 1.0])
 
             
             
