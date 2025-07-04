@@ -25,9 +25,6 @@ https://andrewkeyanzhe.github.io/posts/ScreenCaptureKit_docs/
 ### Install:
 Download the latest installation file [here](../../releases/latest) or install via Homebrew:
 
-```bash
-brew install lihaoyun6/tap/quickrecorder
-```
 
 ### Features/Usage:
 - You can use QuickRecorder to record your screens / windows / applications / mobile devices... etc.
