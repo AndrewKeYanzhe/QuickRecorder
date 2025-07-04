@@ -33,8 +33,8 @@ Download the latest installation file [under the releases page](../../releases/l
 ## HDR screen recording instructions (updated as of 4 July 2025)
 
 macOS applications typically display HDR content using this scaling
-- PQ HDR **images** are typically displayed using PQ 203 nits = SDR 1.0 (true for Chrome and Lightroom)
-- PQ HDR **videos** are typically displayed using PQ 100 nits = SDR 1.0
+- PQ HDR **images** are typically displayed using PQ 203 nits (media) = SDR 1.0 (hardware brightness). This is true for Chrome and Lightroom
+- PQ HDR **videos** are typically displayed using PQ 100 nits (media) = SDR 1.0 (hardware brightness)
 
 Currently QuickRecorder uses `captureHDRStreamCanonicalDisplay` which saves the screen recording in a PQ BT2020 container, with SDR 1.0 encoded based on the physical display's brightness. For example, if the display is set at SDR = 300 nits, then the screen recording's SDR or EDR 1.0 value is encoded as 300 nits PQ.
 
