@@ -34,7 +34,28 @@ brew install lihaoyun6/tap/quickrecorder
 
 - QuickRecorder supports driver-free audio loopback recording, mouse highlighting, screen magnifier and many more useful features.  
 - The new **"[Presenter Overlay](https://support.apple.com/guide/facetime/presenter-overlay-video-conferencing-fctm6333f4bd/mac)"** in macOS 14 was fully supported by QuickRecorder, which can overlay the camera in real time on your recording *(macOS 12/13 can only use camera floating window)*  
-- QuickRecorder is able to record `HEVC with Alpha` video format, that can contain alpha channel in the output file *(currently only iMovie and FCPX support this feature)*  
+- QuickRecorder is able to record `HEVC with Alpha` video format, that can contain alpha channel in the output file *(currently only iMovie and FCPX support this feature)*
+
+## HDR screen recording instructions (updated as of 4 July 2025)
+
+macOS applications typically display HDR content using this scaling
+- PQ HDR **images** are typically displayed using PQ 203 nits = SDR 1.0 (true for Chrome and Lightroom)
+- PQ HDR **videos** are typically displayed using PQ 100 nits = SDR 1.0
+
+Currently QuickRecorder uses `captureHDRStreamCanonicalDisplay` which saves the screen recording in a PQ BT2020 container, with SDR 1.0 encoded based on the physical display's brightness. For example, if the display is set at SDR = 300 nits, then the screen recording's SDR or EDR 1.0 value is encoded as 300 nits PQ.
+
+Therefore, the recommended usage is:
+- When recording HDR screenshots, set display brightness to 203 nits.
+  - For Macbook Pros with XDR displays: create a reference mode in system settings and set the SDR brightness to 203
+  - For other Macbooks: use the `brightness` homebrew package to set SDR brightness, and also disable auto brightness
+- When recording HDR videos, set display brightness to 100 nits.
+
+This ensures that if an HDR photo or video is displayed in an application, and recorded using QuickRecorder, the final exposure in the recorded file is the same as the original media.
+
+HDR screenshots can be recorded using the following steps:
+1. Go to QuickRecorder preferences > Hotkey > set `Save Current Frame` to the preferred shortcut
+2. Start a screen recording, and press the shortcut for `Save Current Frame`
+3. This saves a 16 bit PNG with 4:4:4 chroma sampling in the PQ BT2020 container.
 
 ## Q&A
 **1. Where can I reopen the main panel after closing it?**
