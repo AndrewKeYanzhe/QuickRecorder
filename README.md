@@ -5,9 +5,6 @@
 <h3 align="center">A lightweight and high-performance screen recorder for macOS<br><a href="./README_zh.md">[中文版本]</a><br><a href="https://lihaoyun6.github.io/quickrecorder/">[Landing Page]</a>
 </p>
 
-## ScreenCaptureKit documentation
-
-https://andrewkeyanzhe.github.io/posts/ScreenCaptureKit_docs/
 
 ## Screenshot
 <p align="center">
