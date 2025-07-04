@@ -23,7 +23,7 @@ https://andrewkeyanzhe.github.io/posts/ScreenCaptureKit_docs/
 - macOS 12.3 and Later
 
 ### Install:
-Download the latest installation file [here](../../releases/latest).
+Download the latest installation file [under the releases page](../../releases/latest).
 
 
 ### Features/Usage:
