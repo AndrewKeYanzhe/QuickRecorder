@@ -153,8 +153,8 @@ extension AppDelegate {
                 // hdrLocalDisplay or hdrCanonicalDisplay
 
 
-                // conf = SCStreamConfiguration(preset: .captureHDRStreamLocalDisplay)
-                conf = SCStreamConfiguration(preset: .captureHDRStreamCanonicalDisplay)
+                conf = SCStreamConfiguration(preset: .captureHDRStreamLocalDisplay)
+                // conf = SCStreamConfiguration(preset: .captureHDRStreamCanonicalDisplay)
             } else { conf = SCStreamConfiguration() }
         } else { conf = SCStreamConfiguration() }
 #else
