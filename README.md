@@ -29,7 +29,9 @@ Currently QuickRecorder uses `captureHDRStreamLocalDisplay` which saves the scre
 Therefore, the recommended usage is:
 - When recording HDR screenshots, set display brightness to 203 nits.
   - For Macbook Pros with XDR displays: create a reference mode in system settings and set the SDR brightness to 203
-  - For other Macbooks: use the `brightness` homebrew package to set SDR brightness, and also disable auto brightness
+  - For other Macbooks: use the `brightness` homebrew package to set SDR brightness:
+    - brightness is set using a value from 0 - 1. Check using the macOS Console to verify that SDR brightness in nits is set to the desired value
+    - disable auto brightness
 - When recording HDR videos, set display brightness to 100 nits.
 
 This ensures that if an HDR photo or video is displayed in an application, and recorded using QuickRecorder, the final exposure in the recorded file is the same as the original media.
