@@ -24,6 +24,8 @@ macOS applications typically display HDR content using this scaling
 - PQ HDR **images** are typically displayed using PQ 203 nits (media) = SDR 1.0 (physical nits depends on macOS brightness setting). This is true for Chrome and Lightroom
 - PQ HDR **videos** are typically displayed using PQ 100 nits (media) = SDR 1.0 (physical nits depends on macOS brightness setting)
 
+However, this may not be true for every application. The macOS Photos app appears to show images using PQ 203 nits (media) = SDR 2.03.
+
 Currently QuickRecorder uses `captureHDRStreamLocalDisplay` which saves the screen recording in a PQ BT2020 container, with SDR 1.0 encoded based on the physical display's brightness. For example, if the display is set at SDR = 300 nits, then the screen recording's SDR or EDR 1.0 value is encoded as 300 nits PQ. This behaviour is verified on macOS Sequoia. However, macOS 26 seems to have altered the API behaviour.
 
 Therefore, the recommended usage is:
