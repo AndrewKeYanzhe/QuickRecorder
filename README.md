@@ -5,7 +5,8 @@
 <h3 align="center">A lightweight and high-performance HDR screen recorder for macOS
 </p>
 
-
+## Features
+QuickRecorder records 16 bit HDR PNG screenshots and 10 bit HDR HEVC screen recordings. Screenshots and screen recordings are both in the PQ BT2020 colorspace and utilise chroma 4:4:4 sampling.
 
 ## Installation and Usage
 ### System Requirements:
