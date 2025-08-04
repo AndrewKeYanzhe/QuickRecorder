@@ -23,8 +23,17 @@ Download the latest installation file [under the releases page](../../releases/l
 
 macOS applications typically display HDR content using this scaling
 - PQ HDR **images** are typically displayed using PQ 203 nits (media) = SDR 1.0 (physical nits depends on macOS brightness setting). This is true for Chrome and Lightroom
-- PQ HDR **videos** are typically displayed using PQ 100 nits (media) = SDR 1.0 (physical nits depends on macOS brightness setting)
-
+- PQ HDR **videos** are typically displayed using roughly PQ 100 nits (media) = SDR 1.0 (physical nits depends on macOS brightness setting)
+  - Apple XDR Display (P3-1600 nits) profile
+    - set to SDR=100 nits physical, displaying 100 nits PQ pattern, viewed using QuickTime:
+    - Digital Colour Meter: pattern is displayed with value of 243 (gamma 2.2 8 bit) = 89.9 nits
+    - Darktable using HDR screenshot (captureHDRStreamLocalDisplay): clipping occurs at 92 nits (stops clipping at 0.93% linear PQ), so test pattern is 92 nits.
+      - (for reference, with SDR white, darktable clips at 1% linear PQ, stops clipping at 1.01% linear PQ)
+  - HDR Video (P3-ST 2084) profile
+    - displaying 100 nits PQ pattern, viewed using QuickTime:
+    - Digital Colour Meter: pattern is displayed with value of 255 (gamma 2.2 8 bit) = 100 nits
+    - Darktable using HDR screenshot (captureHDRStreamLocalDisplay): clipping occurs at exactly 100 nits (1% linear PQ), at exactly the same point as SDR white.
+      
 However, this may not be true for every application. The macOS Photos app appears to show images using PQ 203 nits (media) = SDR 2.03.
 
 Currently QuickRecorder uses `captureHDRStreamLocalDisplay` which saves the screen recording in a PQ BT2020 container, with SDR 1.0 encoded based on the physical display's brightness. For example, if the display is set at SDR = 300 nits, then the screen recording's SDR or EDR 1.0 value is encoded as 300 nits PQ. This behaviour is verified on macOS Sequoia. However, macOS 26 seems to have altered the API behaviour.
