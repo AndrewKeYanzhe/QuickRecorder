@@ -288,7 +288,7 @@ extension AppDelegate {
         do {
             try SCContext.stream.addStreamOutput(self, type: .screen, sampleHandlerQueue: .global())
             if #available(macOS 13, *) { try SCContext.stream.addStreamOutput(self, type: .audio, sampleHandlerQueue: .global()) }
-            if !audioOnly {
+            if !audioOnly && !SCContext.screenshotOnly {
                 initVideo(conf: conf)
             } else {
                 //SCContext.startTime = Date.now
@@ -546,7 +546,9 @@ extension AppDelegate {
                     print("Error: \(error)")
                 }
 //                CGImageDestinationFinalize(destination)
-            
+            if SCContext.screenshotOnly {
+                SCContext.stopRecording()
+            }
         }
         if SCContext.isPaused { return }
         guard sampleBuffer.isValid else { return }

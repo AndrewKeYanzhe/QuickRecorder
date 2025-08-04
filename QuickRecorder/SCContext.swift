@@ -26,6 +26,7 @@ class SCContext {
     static var filter: SCContentFilter?
     static var isMagnifierEnabled = false
     static var saveFrame = false
+    static var screenshotOnly = false
     static var isPaused = false
     static var isResume = false
     static var isSkipFrame = false
@@ -332,9 +333,14 @@ class SCContext {
         recordCam = ""
         recordDevice = ""
         isMagnifierEnabled = false
-        mousePointer.orderOut(nil)
-        screenMagnifier.orderOut(nil)
-        AppDelegate.shared.stopGlobalMouseMonitor()
+        if !SCContext.screenshotOnly {
+            mousePointer.orderOut(nil)
+            screenMagnifier.orderOut(nil)
+            AppDelegate.shared.stopGlobalMouseMonitor()
+        }
+        
+        
+        
 
         if let w = NSApp.windows.first(where:  { $0.title == "Area Overlayer".local }) { w.close() }
         
@@ -344,13 +350,18 @@ class SCContext {
             micInput.markAsFinished()
             AudioRecorder.shared.stop()
             audioEngine.inputNode.removeTap(onBus: 0)
-            audioEngine.stop()
+            
+            //if screenshot only mode, then the audio engine is not running
+            if audioEngine.isRunning {
+                audioEngine.stop()
+            }
             //DispatchQueue.global().async { try? audioEngine.inputNode.setVoiceProcessingEnabled(false) }
             if ud.bool(forKey: "enableAEC") { try? AECEngine.stopAudioUnit() }
         }
-        if streamType != .systemaudio {
+        if streamType != .systemaudio && !SCContext.screenshotOnly{
             let dispatchGroup = DispatchGroup()
             dispatchGroup.enter()
+            
             vwInput.markAsFinished()
             if #available(macOS 13, *) { awInput.markAsFinished() }
             vW.finishWriting {
@@ -466,13 +477,17 @@ class SCContext {
                 let id = "quickrecorder.completed.\(UUID().uuidString)"
                 showNotification(title: title, body: body, id: id)
             } else {
-                showPreview(path: filePath)
+                if !SCContext.screenshotOnly {
+                    showPreview(path: filePath)
+                }
+                
             }
             trimVideo()
         }
         
         streamType = nil
         firstFrame = nil
+        SCContext.screenshotOnly = false
     }
     
     static func showPreview(path: String, image: NSImage? = nil) {
