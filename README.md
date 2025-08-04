@@ -24,15 +24,15 @@ Download the latest installation file [under the releases page](../../releases/l
 macOS applications typically display HDR content using this scaling
 - PQ HDR **images** are typically displayed using PQ 203 nits (media) = SDR 1.0 (physical nits depends on macOS brightness setting). This is true for Chrome and Lightroom
 - PQ HDR **videos** are typically displayed using roughly PQ 100 nits (media) = SDR 1.0 (physical nits depends on macOS brightness setting)
-  - Apple XDR Display (P3-1600 nits) profile
-    - set to SDR=100 nits physical, displaying 100 nits PQ pattern, viewed using QuickTime:
+  - `Apple XDR Display (P3-1600 nits) profile`
+    - set to SDR=100 nits physical, displaying `100 nits PQ pattern`, viewed using QuickTime:
     - Digital Colour Meter: pattern is displayed with value of 243 (gamma 2.2 8 bit) = 89.9 nits
-    - Darktable using HDR screenshot (captureHDRStreamLocalDisplay): clipping occurs at 92 nits (stops clipping at 0.93% linear PQ), so test pattern is 92 nits.
+    - Darktable using HDR screenshot (captureHDRStreamLocalDisplay): clipping occurs at 92 nits (stops clipping at 0.93% linear PQ), so `test pattern is shown at 92 nits`.
       - (for reference, with SDR white, darktable clips at 1% linear PQ, stops clipping at 1.01% linear PQ)
-  - HDR Video (P3-ST 2084) profile
-    - displaying 100 nits PQ pattern, viewed using QuickTime:
+  - `HDR Video (P3-ST 2084) profile`
+    - displaying `100 nits PQ pattern`, viewed using QuickTime:
     - Digital Colour Meter: pattern is displayed with value of 255 (gamma 2.2 8 bit) = 100 nits
-    - Darktable using HDR screenshot (captureHDRStreamLocalDisplay): clipping occurs at exactly 100 nits (1% linear PQ), at exactly the same point as SDR white.
+    - Darktable using HDR screenshot (captureHDRStreamLocalDisplay): clipping occurs at exactly 100 nits (1% linear PQ), at exactly the same point as SDR white. `Test pattern is shown at 100 nits`.
       
 However, this may not be true for every application. The macOS Photos app appears to show images using PQ 203 nits (media) = SDR 2.03.
 
