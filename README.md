@@ -16,10 +16,17 @@ QuickRecorder records 16 bit HDR PNG screenshots and 10 bit HDR HEVC screen reco
 ### Install:
 Download the latest installation file [under the releases page](../../releases/latest).
 
+### Usage instructions:
+
+Record HDR videos:
+1. Follow the user interface.
+
+Record HDR screenshorts
+1. Go to QuickRecorder preferences > Hotkey > set `Save Current Frame` to the preferred shortcut
+2. Press shortcut to take a HDR screenshot
 
 
-
-## HDR screen recording instructions (updated as of 4 July 2025)
+## HDR screen recording documentation (updated as of 4 July 2025)
 
 macOS applications typically display HDR content using this scaling
 - PQ HDR **images** are typically displayed using PQ 203 nits (media) = SDR 1.0 (physical nits depends on macOS brightness setting). This is true for Chrome and Lightroom
@@ -53,9 +60,5 @@ Therefore, the recommended usage is:
 
 This ensures that if an HDR photo or video is displayed in an application, and recorded using QuickRecorder, the final exposure in the recorded file is the same as the original media.
 
-HDR screenshots can be recorded using the following steps:
-1. Go to QuickRecorder preferences > Hotkey > set `Save Current Frame` to the preferred shortcut
-2. Start a screen recording, and press the shortcut for `Save Current Frame`
-3. This saves a 16 bit PNG with 4:4:4 chroma sampling in the PQ BT2020 container.
 
 
