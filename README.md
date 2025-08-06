@@ -30,17 +30,15 @@ Record HDR screenshorts
 
 macOS applications typically display HDR content using this scaling
 - PQ HDR **images** are typically displayed using PQ 203 nits (media) = SDR 1.0 (physical nits depends on macOS brightness setting). This is true for Chrome and Lightroom
-- PQ HDR **videos** are typically displayed using roughly PQ 100 nits (media) = SDR 1.0 (physical nits depends on macOS brightness setting)
+- PQ HDR **videos** are typically displayed using roughly PQ 100 nits (media) ≈ SDR 1.0 (physical nits depends on macOS brightness setting)
   - `Apple XDR Display (P3-1600 nits) profile`
     - set to SDR=100 nits physical, displaying `100 nits PQ pattern`, viewed using QuickTime:
-    - Digital Colour Meter: pattern is displayed with value of 243 (sRGB 8 bit) ≈ 90 nits
-    - Darktable using HDR screenshot (captureHDRStreamLocalDisplay): clipping occurs at 92 nits (stops clipping at 0.93% linear PQ), so `test pattern is shown at 92 nits`.
+    - Darktable using HDR screenshot (captureHDRStreamLocalDisplay): clipping occurs at 112 nits (stops clipping at 1.13% linear PQ), so `test pattern is shown at 112 nits`.
       - (for reference, with SDR white, darktable clips at 1% linear PQ, stops clipping at 1.01% linear PQ)
   - `HDR Video (P3-ST 2084) profile`
     - displaying `100 nits PQ pattern`, viewed using QuickTime:
-    - Digital Colour Meter: pattern is displayed with value of 255 (sRGB 8 bit) = 100 nits
     - Darktable using HDR screenshot (captureHDRStreamLocalDisplay): clipping occurs at exactly 100 nits (1% linear PQ), at exactly the same point as SDR white. `Test pattern is shown at 100 nits`.
-  - SDR colour profile
+  - External monitor with no HDR support
     - 100 nits PQ pattern shown using QuickTime:
       - Digital Colour Meter: pattern is displayed with value of 141 (sRGB 8 bit) ≈ 27 nits
     - 203 nits PQ pattern shown using QuickTime:
