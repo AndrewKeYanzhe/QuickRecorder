@@ -69,6 +69,7 @@ On the Macbook Pro 16 with XDR display, the Photos app appears to show images us
 
 ````diff
 - Overall, PQ EOTF tracking on macOS can be unpredictable, and depends on the monitor used and the application.
+! On some HDR monitors, QuickTime shows the HDR video as half as bright as Davinci Resolve
 ````
       
 
