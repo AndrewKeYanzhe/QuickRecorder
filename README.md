@@ -28,9 +28,18 @@ Record HDR screenshorts
 
 ## HDR screen recording documentation (updated as of 4 July 2025)
 
-macOS applications typically display HDR content using this scaling
-- PQ HDR **images** are typically displayed using PQ 203 nits (media) = SDR 1.0 (physical nits depends on macOS brightness setting). This is true for Chrome and Lightroom
-- PQ HDR **videos** are typically displayed using roughly PQ 100 nits (media) ≈ SDR 1.0 (physical nits depends on macOS brightness setting)
+On macOS, PQ HDR **images** are typically displayed using 
+````diff
+- PQ 203 nits (media) = SDR 1.0 . (Chrome and Lightroom). Hence the monitor should be set to SDR = 203 nits.
+````
+PQ HDR **videos** are typically displayed using
+````diff
++ PQ 100 nits (media) ≈ SDR 1.0 for the Macbook Pro 16 XDR (Hence the monitor should be set to SDR = 100 nits)
+- PQ 100 nits (media) = SDR 0.47 for a 400 nit HDR monitor (Hence the monitor should be set to SDR ≈ 203 nits)
+````
+
+
+Detailed tests performed to verify PQ EOTF tracking for videos in QuickTime:
   - `Apple XDR Display (P3-1600 nits) profile`
     - set to SDR=100 nits physical, displaying `100 nits PQ pattern`, viewed using QuickTime:
     - Darktable using HDR screenshot (captureHDRStreamLocalDisplay): clipping occurs at 112 nits (stops clipping at 1.13% linear PQ), so `test pattern is shown at 112 nits`.
@@ -38,13 +47,26 @@ macOS applications typically display HDR content using this scaling
   - `HDR Video (P3-ST 2084) profile`
     - displaying `100 nits PQ pattern`, viewed using QuickTime:
     - Darktable using HDR screenshot (captureHDRStreamLocalDisplay): clipping occurs at exactly 100 nits (1% linear PQ), at exactly the same point as SDR white. `Test pattern is shown at 100 nits`.
-  - External monitor with no HDR support
+  - External monitor with `no HDR support`
     - 100 nits PQ pattern shown using QuickTime:
-      - Digital Colour Meter: pattern is displayed with value of 141 (sRGB 8 bit) ≈ 27 nits
+      - Digital Colour Meter: `100 nits pattern` is displayed with value of 141 (sRGB 8 bit) ≈ `27 nits`
     - 203 nits PQ pattern shown using QuickTime:
       - Digital Colour Meter: pattern is displayed with value of 174 (sRGB 8 bit) ≈ 42 nits
+  - External monitor with `HDR peak of 417.71 nits, set to SDR = 100 nits` (verified using Console).
+    - 100 nits PQ pattern shown using QuickTime:
+      - Darktable using HDR screenshot (captureHDRStreamLocalDisplay): clipping occurs at 0.47% linear PQ. `Hence 100 nits test pattern is shown at 47 nits`
+  - External monitor with `HDR peak of 417.71 nits, set to SDR = 203 nits` (verified using Console).
+    - 100 nits PQ pattern shown using QuickTime:
+      - Darktable using HDR screenshot (captureHDRStreamLocalDisplay): clipping occurs at 0.96% linear PQ. `Hence 100 nits test pattern is shown at 96 nits`
+
+
+On the Macbook Pro 16 with XDR display, the Photos app appears to show images using PQ 203 nits (media) = SDR 2.03.
+
+
+````diff
+- Overall, PQ EOTF tracking on macOS can be unpredictable, and depends on the monitor used and the application.
+````
       
-However, this may not be true for every application. The macOS Photos app appears to show images using PQ 203 nits (media) = SDR 2.03.
 
 Currently QuickRecorder uses `captureHDRStreamLocalDisplay` which saves the screen recording in a PQ BT2020 container, with SDR 1.0 encoded based on the physical display's brightness. For example, if the display is set at SDR = 300 nits, then the screen recording's SDR or EDR 1.0 value is encoded as 300 nits PQ. This behaviour is verified on macOS Sequoia. However, macOS 26 seems to have altered the API behaviour.
 
