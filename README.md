@@ -37,6 +37,10 @@ PQ HDR **videos** are typically displayed using
 + PQ 100 nits (media) ≈ SDR 1.0 for the Macbook Pro 16 XDR (Hence the monitor should be set to SDR = 100 nits)
 - PQ 100 nits (media) = SDR 0.47 for a 400 nit HDR monitor (Hence the monitor should be set to SDR ≈ 203 nits)
 ````
+DaVinci Resolve always displays as
+````diff
++ PQ 100 nits (media) = SDR 1.0 for MBP and external HDR monitor (so the display should be set to SDR = 100 nits)
+````
 
 
 Detailed tests performed to verify PQ EOTF tracking for videos in QuickTime:
