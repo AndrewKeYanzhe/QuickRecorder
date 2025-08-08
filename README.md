@@ -36,11 +36,15 @@ PQ HDR **videos** are typically displayed using
 ````diff
 + PQ 100 nits (media) ≈ SDR 1.0 (Macbook Pro 16 XDR).  Recommended SDR brightness = 100 nits
 - PQ 100 nits (media) = SDR 0.47 (400 nit HDR screen).  Recommended SDR brightness = 203 nits
+# The 400 nit HDR screen is the MSI MP273U
 ````
 DaVinci Resolve always displays as
 ````diff
 + PQ 100 nits (media) = SDR 1.0. Recommended SDR brightness = 100 nits
 # This is true for the Macbook Pro 16 and the 400 nit HDR screen
+
++ Therefore, for the MBP 16, QuickTime and Davinci Resolve match in brightness
+! However, for external HDR displays, QuickTime and Davinci Resolve brightness MIGHT NOT match. 
 ````
 
 
