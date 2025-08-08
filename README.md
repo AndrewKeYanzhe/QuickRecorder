@@ -30,16 +30,16 @@ Record HDR screenshorts
 
 On macOS, PQ HDR **images** are typically displayed using 
 ````diff
-- PQ 203 nits (media) = SDR 1.0 . (Chrome and Lightroom). Hence the monitor should be set to SDR = 203 nits.
+- PQ 203 nits (media) = SDR 1.0 (Chrome, Lightroom). Recommended screen brightness: SDR = 203 nits.
 ````
 PQ HDR **videos** are typically displayed using
 ````diff
-+ PQ 100 nits (media) ≈ SDR 1.0 for the Macbook Pro 16 XDR (Hence the monitor should be set to SDR = 100 nits)
-- PQ 100 nits (media) = SDR 0.47 for a 400 nit HDR monitor (Hence the monitor should be set to SDR ≈ 203 nits)
++ PQ 100 nits (media) ≈ SDR 1.0 (Macbook Pro 16 XDR).  Recommended screen brightness: SDR = 100 nits
+- PQ 100 nits (media) = SDR 0.47 (400 nit HDR monitor).  Recommended screen brightness: SDR ≈ 203 nits
 ````
 DaVinci Resolve always displays as
 ````diff
-+ PQ 100 nits (media) = SDR 1.0 for MBP and external HDR monitor (so the display should be set to SDR = 100 nits)
++ PQ 100 nits (media) = SDR 1.0 (MBP and external HDR monitor). Recommended screen brightness: SDR = 100 nits
 ````
 
 
