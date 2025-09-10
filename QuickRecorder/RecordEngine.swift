@@ -793,7 +793,7 @@ extension AppDelegate {
                 let avgBlue = bitmap[2]
 
                 // 5. Calculate the final average luminance using the Rec. 2020 coefficients.
-                let averageLuminance = (0.2627 * avgRed) + (0.6780 * avgGreen) + (0.0593 * avgBlue)
+                let averageLuminance = ((0.2627 * avgRed) + (0.6780 * avgGreen) + (0.0593 * avgBlue))*100
 
                 print("--- Frame Analysis (Core Image) ---")
                 print("Average Luminance: \(String(format: "%.6f", averageLuminance)) nits")
