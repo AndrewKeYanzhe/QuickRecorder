@@ -106,6 +106,12 @@ extension Scene {
 }
 
 class AppDelegate: NSObject, NSApplicationDelegate, SCStreamDelegate, SCStreamOutput, AVCaptureVideoDataOutputSampleBufferDelegate  {
+
+    // ADD THE LINE HERE
+    lazy var ciContext = CIContext()
+
+    // TODO create another ciContext for screenshot
+
     static let shared = AppDelegate()
     var filter: SCContentFilter?
     var isCameraReady = false

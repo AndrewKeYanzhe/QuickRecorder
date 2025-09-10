@@ -699,6 +699,107 @@ extension AppDelegate {
                 }
 
 
+
+                // get avg of whole screen
+                var buffer_ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+
+                // --- Print its Key Properties ---
+
+                print("--- Buffer CIImage Properties ---")
+
+                // 1. Extent: The image's width and height.
+                print("Extent: \(buffer_ciImage.extent)")
+
+                // 2. Properties: Metadata dictionary (usually empty for buffers).
+                print("Properties: \(buffer_ciImage.properties)")
+
+                // 3. Color Space: How the colors are defined.
+                if let colorSpace = buffer_ciImage.colorSpace {
+                    print("Color Space: \(colorSpace)")
+                } else {
+                    // This is common for YCbCr buffers until they are rendered into an RGB space.
+                    print("Color Space: nil")
+                }
+                
+
+                // --- Apply the exposure filter --- (scale by 2.03). this modifies buffer_ciImage
+                if let exposureFilter = CIFilter(name: "CIExposureAdjust") {
+                    exposureFilter.setValue(buffer_ciImage, forKey: kCIInputImageKey)
+                    exposureFilter.setValue(1.02147972741, forKey: kCIInputEVKey)
+                    
+                    // Safely unwrap the output and re-assign it to your variable
+                    if let exposedImage = exposureFilter.outputImage {
+                        buffer_ciImage = exposedImage
+                    } else {
+                        print("Error: Exposure filter failed to produce an output.")
+                    }
+                }
+//                
+
+                
+                
+
+//                // Assume you have 'outputImage' from the average filter and your reusable 'ciContext'
+//
+//                // The bitmap must be Float to hold the extended range values
+//                var bitmap: [Float] = [0, 0, 0, 0]
+//                
+                let linearPQ = CGColorSpace(name: CGColorSpace.extendedLinearITUR_2020)
+//
+//                // Render the 1x1 output image into the specified extended linear color space
+//                self.ciContext.render(buffer_ciImage,
+//                                      toBitmap: &bitmap,
+//                                      rowBytes: 16, // 4 floats * 4 bytes/float
+//                                      bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
+//                                      format: .RGBAf, // The format must be float
+//                                      // USE THE SPECIFIED COLOR SPACE HERE
+//                                      colorSpace: linearPQ
+//                )
+//
+//                // The bitmap now contains the average color in linear BT.2020 light
+//                let red = bitmap[0]
+//                let green = bitmap[1]
+//                let blue = bitmap[2]
+//                let alpha = bitmap[3]
+
+                // 2. Create and configure the Area Average filter.
+                // We use the image's full extent to average the whole thing.
+                let averageFilter = CIFilter(name: "CIAreaAverage", parameters: [
+                    kCIInputImageKey: buffer_ciImage,
+                    kCIInputExtentKey: buffer_ciImage.extent
+                ])!
+
+                guard let outputImage = averageFilter.outputImage else {
+                    print("Error: Failed to get output from CIAreaAverage filter.")
+                    SCContext.vwInput.append(SampleBuffer) // Still append the original frame
+                    return
+                }
+
+                // 3. Render the 1x1 output pixel to get the float values.
+                var bitmap: [Float] = [0, 0, 0, 0]
+                self.ciContext.render(outputImage,
+                                      toBitmap: &bitmap,
+                                      rowBytes: 16, // 4 floats * 4 bytes/float
+                                      bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
+                                      format: .RGBAf,
+                                      colorSpace: linearPQ)
+
+                // 4. Extract the average linear RGB values.
+                let avgRed = bitmap[0]
+                let avgGreen = bitmap[1]
+                let avgBlue = bitmap[2]
+
+                // 5. Calculate the final average luminance using the Rec. 2020 coefficients.
+                let averageLuminance = (0.2627 * avgRed) + (0.6780 * avgGreen) + (0.0593 * avgBlue)
+
+                print("--- Frame Analysis (Core Image) ---")
+                print("Average Luminance: \(String(format: "%.6f", averageLuminance)) nits")
+                print("Average Linear RGB: (R: \(avgRed), G: \(avgGreen), B: \(avgBlue))")
+                print("---------------------------------")
+
+
+
+
                 SCContext.vwInput.append(SampleBuffer)
             }
             break
