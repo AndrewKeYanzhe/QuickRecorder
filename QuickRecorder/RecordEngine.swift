@@ -795,6 +795,8 @@ extension AppDelegate {
                 // 5. Calculate the final average luminance using the Rec. 2020 coefficients.
                 let averageLuminance = ((0.2627 * avgRed) + (0.6780 * avgGreen) + (0.0593 * avgBlue))*100
 
+                floatingPanelController.updateNitsValue(averageLuminance)
+
                 print("--- Frame Analysis (Core Image) ---")
                 
                 print("Average Linear RGB: (R: \(avgRed), G: \(avgGreen), B: \(avgBlue))")

@@ -112,6 +112,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, SCStreamDelegate, SCStreamOu
 
     // TODO create another ciContext for screenshot
 
+
+    var window: NSWindow!
+    // Create an instance of the controller
+    let floatingPanelController = FloatingPanelController()
+
     static let shared = AppDelegate()
     var filter: SCContentFilter?
     var isCameraReady = false
@@ -364,6 +369,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, SCStreamDelegate, SCStreamOu
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         closeAllWindow()
         if showOnDock { _ = applicationShouldHandleReopen(NSApp, hasVisibleWindows: true) }
+        floatingPanelController.show()
     }
     
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
