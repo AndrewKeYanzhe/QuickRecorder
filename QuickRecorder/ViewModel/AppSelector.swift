@@ -244,6 +244,7 @@ struct OptionsView: View {
                         Text("24 FPS").tag(24)
                         Text("15 FPS").tag(15)
                         Text("10 FPS").tag(10)
+                        Text("1 FPS").tag(1)
                     }
                     .buttonStyle(.borderless)
                     .frame(minWidth: isMacOS12 ? 100 : 10)
