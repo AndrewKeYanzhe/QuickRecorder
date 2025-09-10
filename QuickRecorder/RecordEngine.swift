@@ -604,6 +604,83 @@ extension AppDelegate {
                 }
                 if isPresenterON && !isCameraReady { break }
                 if SCContext.firstFrame == nil { SCContext.firstFrame = SampleBuffer }
+
+                // SampleBuffer is the video frame from ScreenCaptureKit.
+                // SCContext.vwInput is your AVAssetWriterInput for video.
+                // When ready, you append the sample buffer, which writes the frame into the video file via AVAssetWriter.
+
+                // ...inside stream(_:didOutputSampleBuffer:of:) before using sampleBuffer...
+                // print("isValid:", sampleBuffer.isValid)
+                // print("numSamples:", CMSampleBufferGetNumSamples(sampleBuffer))
+                // print("presentationTimeStamp:", CMSampleBufferGetPresentationTimeStamp(sampleBuffer))
+                print("----------------------------------------")
+                // print("duration:", CMSampleBufferGetDuration(sampleBuffer))
+                // print("decodeTimeStamp:", CMSampleBufferGetDecodeTimeStamp(sampleBuffer))
+                print("\nimageBuffer:", sampleBuffer.imageBuffer as Any)
+                print("\ndataBuffer:", sampleBuffer.dataBuffer as Any)
+                if let formatDesc = CMSampleBufferGetFormatDescription(sampleBuffer) {
+                    print("\nmediaType:", CMFormatDescriptionGetMediaType(formatDesc))
+                    print("\nformatDescription:", formatDesc)
+                }
+                if let attachmentsArray = CMSampleBufferGetSampleAttachmentsArray(sampleBuffer, createIfNecessary: false) as? [[AnyHashable: Any]] {
+                    // print("attachments:", attachmentsArray)
+                }
+
+                // Get the pixel buffer, lock it, and ensure it gets unlocked.
+                guard let pixelBuffer = sampleBuffer.imageBuffer else { return }
+                CVPixelBufferLockBaseAddress(pixelBuffer, .readOnly)
+                defer { CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly) }
+
+                // Get the Y-plane address and cast it to a UInt16 pointer
+                if let yPlaneAddr = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 0) {
+
+                    // Read the raw 16-bit value top left
+                    // let raw_yValue = yPlaneAddr.assumingMemoryBound(to: UInt16.self)[0]
+
+                    
+                    // Correct the value by shifting right by 6 bits. so it is 10 bit stored in 16 bit container, MSB (left justified)
+                    
+                    let width = CVPixelBufferGetWidth(pixelBuffer)
+                    let height = CVPixelBufferGetHeight(pixelBuffer)
+                    
+                    // 1. Calculate the index for the bottom-left pixel (x=0, y=height-1)
+                    let index = (height - 1) * width
+                    
+                    // 2. Read the raw 16-bit value at that index
+                    let raw_yValue = yPlaneAddr.assumingMemoryBound(to: UInt16.self)[index]
+                    
+                    // 3. Correct the value by shifting right by 6 bits
+                    let corrected_yValue = Double(raw_yValue >> 6)
+                    
+                    print("--- Bottom-Left Pixel ---")
+                    print("Coordinate: (x: 0, y: \(height - 1))")
+                    print("Raw 16-bit value: \(raw_yValue)")
+                    print("Corrected 10-bit Y' value: \(Int(corrected_yValue))")
+
+                    // Your corrected 10-bit Y' value
+                    // let corrected_yValue: Double = 332
+
+                    // 1. Normalize the 10-bit value to the range [0.0, 1.0]
+                    let N = Double(corrected_yValue) / 1023.0
+
+                    // 2. Define PQ constants
+                    let m1: Double = 1305.0 / 8192.0
+                    let m2: Double = 2523.0 / 32.0
+                    let c1: Double = 107.0 / 128.0
+                    let c2: Double = 2413.0 / 128.0
+                    let c3: Double = 299.0 / 16.0
+
+                    // 3. Apply the PQ EOTF formula
+                    let n_pow_m2_inv = pow(N, 1.0 / m2)
+                    let numerator = max(n_pow_m2_inv - c1, 0)
+                    let denominator = c2 - c3 * n_pow_m2_inv
+                    let luminance = 10000.0 * pow(numerator / denominator, 1.0 / m1)
+
+                    print("Luminance: \(String(format: "%.2f", luminance)) nits")
+                    // Expected Output: Luminance: 76.73 nits
+                }
+
+
                 SCContext.vwInput.append(SampleBuffer)
             }
             break
