@@ -631,53 +631,71 @@ extension AppDelegate {
                 CVPixelBufferLockBaseAddress(pixelBuffer, .readOnly)
                 defer { CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly) }
 
-                // Get the Y-plane address and cast it to a UInt16 pointer
-                if let yPlaneAddr = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 0) {
-
-                    // Read the raw 16-bit value top left
-                    // let raw_yValue = yPlaneAddr.assumingMemoryBound(to: UInt16.self)[0]
-
-                    
-                    // Correct the value by shifting right by 6 bits. so it is 10 bit stored in 16 bit container, MSB (left justified)
+                // Get base addresses for both planes and buffer dimensions
+                if let yPlaneAddr = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 0),
+                let cbcrPlaneAddr = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 1) {
                     
                     let width = CVPixelBufferGetWidth(pixelBuffer)
                     let height = CVPixelBufferGetHeight(pixelBuffer)
                     
-                    // 1. Calculate the index for the bottom-left pixel (x=0, y=height-1)
+                    // --- 1. Read Raw Y', Cb, and Cr Data ---
+                    let yPlanePointer = yPlaneAddr.assumingMemoryBound(to: UInt16.self)
+                    let cbcrPlanePointer = cbcrPlaneAddr.assumingMemoryBound(to: UInt16.self)
+
+                    // Calculate the index for the bottom-left pixel (x=0, y=height-1)
                     let index = (height - 1) * width
                     
-                    // 2. Read the raw 16-bit value at that index
-                    let raw_yValue = yPlaneAddr.assumingMemoryBound(to: UInt16.self)[index]
+                    // Read the raw 16-bit values at the calculated indices
+                    let raw_yValue = yPlanePointer[index]
+                    // For the interleaved CbCr plane, the index must be doubled
+                    let raw_cbValue = cbcrPlanePointer[index * 2]
+                    let raw_crValue = cbcrPlanePointer[index * 2 + 1]
+
+                    // --- 2. Correct for MSB-Justified Packing ---
+                    let y_corrected = Double(raw_yValue >> 6)
+                    let cb_corrected = Double(raw_cbValue >> 6)
+                    let cr_corrected = Double(raw_crValue >> 6)
                     
-                    // 3. Correct the value by shifting right by 6 bits
-                    let corrected_yValue = Double(raw_yValue >> 6)
+                    print("--- Bottom-Left Pixel Data ---")
+                    print("Corrected Y'CbCr (10-bit): (Y': \(Int(y_corrected)), Cb: \(Int(cb_corrected)), Cr: \(Int(cr_corrected)))")
                     
-                    print("--- Bottom-Left Pixel ---")
-                    print("Coordinate: (x: 0, y: \(height - 1))")
-                    print("Raw 16-bit value: \(raw_yValue)")
-                    print("Corrected 10-bit Y' value: \(Int(corrected_yValue))")
+                    // --- 3. Normalize Corrected Values ---
+                    // Y' is normalized to [0, 1]. Cb and Cr are normalized to [-0.5, 0.5].
+                    let y_norm = y_corrected / 1023.0
+                    let cb_norm = (cb_corrected - 512.0) / 1023.0
+                    let cr_norm = (cr_corrected - 512.0) / 1023.0
 
-                    // Your corrected 10-bit Y' value
-                    // let corrected_yValue: Double = 332
+                    // --- 4. Apply Inverse Rec. 2020 Matrix ---
+                    // Converts Y'CbCr to non-linear R'G'B'
+                    let r_nonlinear = y_norm + 1.4746 * cr_norm
+                    let g_nonlinear = y_norm - 0.16455 * cb_norm - 0.57135 * cr_norm
+                    let b_nonlinear = y_norm + 1.8814 * cb_norm
 
-                    // 1. Normalize the 10-bit value to the range [0.0, 1.0]
-                    let N = Double(corrected_yValue) / 1023.0
+                    // --- 5. Apply PQ EOTF to each R'G'B' component ---
+                    // This converts the non-linear signals to linear light in nits
+                    func pqEOTF(_ N: Double) -> Double {
+                        if N < 0 { return 0 } // Clamp negative values that can result from matrix conversion
+                        let m1 = 1305.0 / 8192.0, m2 = 2523.0 / 32.0
+                        let c1 = 107.0 / 128.0, c2 = 2413.0 / 128.0, c3 = 299.0 / 16.0
+                        
+                        let n_pow_m2_inv = pow(N, 1.0 / m2)
+                        let numerator = max(n_pow_m2_inv - c1, 0)
+                        let denominator = c2 - c3 * n_pow_m2_inv
+                        // Avoid division by zero for pure black
+                        guard denominator > 0 else { return 0.0 }
+                        return 10000.0 * pow(numerator / denominator, 1.0 / m1)
+                    }
 
-                    // 2. Define PQ constants
-                    let m1: Double = 1305.0 / 8192.0
-                    let m2: Double = 2523.0 / 32.0
-                    let c1: Double = 107.0 / 128.0
-                    let c2: Double = 2413.0 / 128.0
-                    let c3: Double = 299.0 / 16.0
+                    let r_nits = pqEOTF(r_nonlinear)
+                    let g_nits = pqEOTF(g_nonlinear)
+                    let b_nits = pqEOTF(b_nonlinear)
 
-                    // 3. Apply the PQ EOTF formula
-                    let n_pow_m2_inv = pow(N, 1.0 / m2)
-                    let numerator = max(n_pow_m2_inv - c1, 0)
-                    let denominator = c2 - c3 * n_pow_m2_inv
-                    let luminance = 10000.0 * pow(numerator / denominator, 1.0 / m1)
-
-                    print("Luminance: \(String(format: "%.2f", luminance)) nits")
-                    // Expected Output: Luminance: 76.73 nits
+                    print("Final RGB (Linear Nits): (R: \(String(format: "%.2f", r_nits)), G: \(String(format: "%.2f", g_nits)), B: \(String(format: "%.2f", b_nits)))")
+                    // --- 6. Calculate Luminance using Rec. 2020 Coefficients ---
+                    let luminance = (0.2627 * r_nits) + (0.6780 * g_nits) + (0.0593 * b_nits)
+                    
+                    print("Luminance (Rec. 2020): \(String(format: "%.2f", luminance)) nits")
+                    print("----------------------------")
                 }
 
 
