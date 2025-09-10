@@ -796,8 +796,9 @@ extension AppDelegate {
                 let averageLuminance = ((0.2627 * avgRed) + (0.6780 * avgGreen) + (0.0593 * avgBlue))*100
 
                 print("--- Frame Analysis (Core Image) ---")
-                print("Average Luminance: \(String(format: "%.6f", averageLuminance)) nits")
+                
                 print("Average Linear RGB: (R: \(avgRed), G: \(avgGreen), B: \(avgBlue))")
+                print("Average Luminance: \(String(format: "%.6f", averageLuminance)) nits")
                 print("---------------------------------")
 
 
