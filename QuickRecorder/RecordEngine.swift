@@ -288,7 +288,7 @@ extension AppDelegate {
         do {
             try SCContext.stream.addStreamOutput(self, type: .screen, sampleHandlerQueue: .global())
             if #available(macOS 13, *) { try SCContext.stream.addStreamOutput(self, type: .audio, sampleHandlerQueue: .global()) }
-            if !audioOnly && !SCContext.screenshotOnly {
+            if !audioOnly && !SCContext.screenshotOnly && SCContext.saveVideo {
                 initVideo(conf: conf)
             } else {
                 //SCContext.startTime = Date.now
@@ -584,27 +584,10 @@ extension AppDelegate {
             if (dur.value > 0) { pts = CMTimeAdd(pts, dur) }
             if frameQueue.getArray().contains(where: { $0 >= pts }) { print("Skip this frame"); return } else { frameQueue.append(pts) }
             SCContext.lastPTS = pts
-            if SCContext.vwInput.isReadyForMoreMediaData {
-                if #available(macOS 14.2, *) {
-                    if let rect = attachments[.presenterOverlayContentRect] as? [String: Any]{
-                        var type = "np"
-                        let off = (rect["X"] as! CGFloat == .infinity)
-                        let small = (rect["X"] as! CGFloat == 0.0)
-                        let big = (!off && !small)
-                        if off { type = "OFF" } else if small { type = "Small" } else if big { type = "Big" }
-                        if type != presenterType {
-                            print("Presenter Overlay set to \"\(type)\"!")
-                            isCameraReady = false
-                            DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(poSafeDelay)) {
-                                self.isCameraReady = true
-                            }
-                            presenterType = type
-                        }
-                    }
-                }
-                if isPresenterON && !isCameraReady { break }
-                if SCContext.firstFrame == nil { SCContext.firstFrame = SampleBuffer }
-
+            
+            var calculateLuminance = true
+            
+            if calculateLuminance{
                 // SampleBuffer is the video frame from ScreenCaptureKit.
                 // SCContext.vwInput is your AVAssetWriterInput for video.
                 // When ready, you append the sample buffer, which writes the frame into the video file via AVAssetWriter.
@@ -737,7 +720,7 @@ extension AppDelegate {
                         print("Error: Exposure filter failed to produce an output.")
                     }
                 }
-//                
+//
 
                 
                 
@@ -746,7 +729,7 @@ extension AppDelegate {
 //
 //                // The bitmap must be Float to hold the extended range values
 //                var bitmap: [Float] = [0, 0, 0, 0]
-//                
+//
                 let linearPQ = CGColorSpace(name: CGColorSpace.extendedLinearITUR_2020)
 //
 //                // Render the 1x1 output image into the specified extended linear color space
@@ -803,6 +786,30 @@ extension AppDelegate {
                 print("Average Luminance: \(String(format: "%.6f", averageLuminance)) nits")
                 print("---------------------------------")
 
+            }
+            
+            if SCContext.vwInput?.isReadyForMoreMediaData ?? false {
+                if #available(macOS 14.2, *) {
+                    if let rect = attachments[.presenterOverlayContentRect] as? [String: Any]{
+                        var type = "np"
+                        let off = (rect["X"] as! CGFloat == .infinity)
+                        let small = (rect["X"] as! CGFloat == 0.0)
+                        let big = (!off && !small)
+                        if off { type = "OFF" } else if small { type = "Small" } else if big { type = "Big" }
+                        if type != presenterType {
+                            print("Presenter Overlay set to \"\(type)\"!")
+                            isCameraReady = false
+                            DispatchQueue.main.asyncAfter(deadline: .now() + TimeInterval(poSafeDelay)) {
+                                self.isCameraReady = true
+                            }
+                            presenterType = type
+                        }
+                    }
+                }
+                if isPresenterON && !isCameraReady { break }
+                if SCContext.firstFrame == nil { SCContext.firstFrame = SampleBuffer }
+
+                
 
 
 
@@ -821,7 +828,9 @@ extension AppDelegate {
                 catch { assertionFailure("audio file writing issue".local) }
             } else {
                 if SCContext.lastPTS == nil { return }
-                if SCContext.awInput.isReadyForMoreMediaData { SCContext.awInput.append(SampleBuffer) }
+                if SCContext.saveVideo{
+                    if SCContext.awInput.isReadyForMoreMediaData { SCContext.awInput.append(SampleBuffer) }
+                }
             }
 #if compiler(>=6.0)
         case .microphone:

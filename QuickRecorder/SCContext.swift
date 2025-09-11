@@ -26,6 +26,7 @@ class SCContext {
     static var filter: SCContentFilter?
     static var isMagnifierEnabled = false
     static var saveFrame = false
+    static var saveVideo = false
     static var screenshotOnly = false
     static var isPaused = false
     static var isResume = false
@@ -362,38 +363,48 @@ class SCContext {
             let dispatchGroup = DispatchGroup()
             dispatchGroup.enter()
             
-            vwInput.markAsFinished()
-            if #available(macOS 13, *) { awInput.markAsFinished() }
-            vW.finishWriting {
-                if vW.status != .completed {
-                    print("Video writing failed with status: \(vW.status), error: \(String(describing: vW.error))")
-                    let err = vW.error?.localizedDescription ?? "Unknow Error"
-                    showNotification(title: "Failed to save file".local, body: "\(err)", id: "quickrecorder.error.\(UUID().uuidString)")
-                } else {
-                    if ud.bool(forKey: "recordMic") && ud.bool(forKey: "recordWinSound") && ud.bool(forKey: "remuxAudio") {
-                        mixAudioTracks(videoURL: filePath.url) { result in
-                            switch result {
-                            case .success(let url):
-                                print("Exported video to \(String(describing: url.path))")
-                                if !ud.bool(forKey: "showPreview") {
-                                    showNotification(title: "Recording Completed".local, body: String(format: "File saved to: %@".local, url.path), id: "quickrecorder.completed.\(UUID().uuidString)")
-                                }
-                                DispatchQueue.main.async {
-                                    if ud.bool(forKey: "trimAfterRecord") {
-                                        AppDelegate.shared.createNewWindow(view: VideoTrimmerView(videoURL: url), title: url.lastPathComponent, only: false)
-                                    } else {
-                                        showPreview(path: url.path)
+            // Check if the video writer (vW) was ever created
+            if let vW = SCContext.vW {
+                // --- Start of wrapped block ---
+                // It's safe to use the inputs now because vW exists
+                SCContext.vwInput?.markAsFinished()
+                if #available(macOS 13, *) {
+                    SCContext.awInput?.markAsFinished()
+                }
+
+                // The finishWriting call and its closure are also inside
+                vW.finishWriting {
+                    if vW.status != .completed {
+                        print("Video writing failed with status: \(vW.status), error: \(String(describing: vW.error))")
+                        let err = vW.error?.localizedDescription ?? "Unknow Error"
+                        showNotification(title: "Failed to save file".local, body: "\(err)", id: "quickrecorder.error.\(UUID().uuidString)")
+                    } else {
+                        if ud.bool(forKey: "recordMic") && ud.bool(forKey: "recordWinSound") && ud.bool(forKey: "remuxAudio") {
+                            mixAudioTracks(videoURL: filePath.url) { result in
+                                switch result {
+                                case .success(let url):
+                                    print("Exported video to \(String(describing: url.path))")
+                                    if !ud.bool(forKey: "showPreview") {
+                                        showNotification(title: "Recording Completed".local, body: String(format: "File saved to: %@".local, url.path), id: "quickrecorder.completed.\(UUID().uuidString)")
                                     }
+                                    DispatchQueue.main.async {
+                                        if ud.bool(forKey: "trimAfterRecord") {
+                                            AppDelegate.shared.createNewWindow(view: VideoTrimmerView(videoURL: url), title: url.lastPathComponent, only: false)
+                                        } else {
+                                            showPreview(path: url.path)
+                                        }
+                                    }
+                                case .failure(let error):
+                                    print("Failed to export video: \(error.localizedDescription)")
                                 }
-                            case .failure(let error):
-                                print("Failed to export video: \(error.localizedDescription)")
                             }
                         }
                     }
+                    dispatchGroup.leave()
                 }
-                dispatchGroup.leave()
+                dispatchGroup.wait()
             }
-            dispatchGroup.wait()
+            
         } else {
             if ud.bool(forKey: "recordMic") { vW.finishWriting {} }
         }
@@ -477,7 +488,7 @@ class SCContext {
                 let id = "quickrecorder.completed.\(UUID().uuidString)"
                 showNotification(title: title, body: body, id: id)
             } else {
-                if !SCContext.screenshotOnly {
+                if !SCContext.screenshotOnly && saveVideo {
                     showPreview(path: filePath)
                 }
                 
